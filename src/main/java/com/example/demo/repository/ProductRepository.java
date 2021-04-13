@@ -10,10 +10,10 @@ import com.example.demo.repository.entity.ProductEntity;
 @Repository
 public interface ProductRepository extends CrudRepository<ProductEntity, Long> {
 
-    Optional<ProductEntity> findProductByName(String name);
+    Optional<ProductEntity> findByName(String name);
 
-    Optional<ProductEntity> findProductById(String productId);
+    Optional<ProductEntity> findByProductId(String productId);
 
-    long deleteProductById(String productId);
+    long deleteByProductId(String productId);
 
 }

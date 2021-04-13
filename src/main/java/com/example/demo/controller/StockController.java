@@ -45,7 +45,7 @@ public class StockController {
 	
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ProductResponseModel getProduct(@PathVariable String id) {
+    public ProductResponseModel getProduct(@PathVariable("id") String id) {
         ProductResponseModel responseModel = new ProductResponseModel();
         Optional<ProductDto> optionalProductDto = productService.getByProductId(id);
         
@@ -81,22 +81,18 @@ public class StockController {
         ProductDto productDtoIn = new ProductDto();
         BeanUtils.copyProperties(requestData, productDtoIn);
         
-        if (productDtoIn.getCost() < 0) {
-			throw new BadRequestException("Cost can not be a negative number");
-		} else {
-	        Optional<ProductDto> productDtoOut = productService.updateProduct(id, productDtoIn);
-	        
-	        if (productDtoOut.isEmpty()) {
-	            throw new NotFoundException("No product found with the id: " + id);
-	        }
-	        
-	        ProductDto productDto = productDtoOut.get();
-	        
-	        ProductResponseModel responseModel = new ProductResponseModel();
-	        BeanUtils.copyProperties(productDto, responseModel);
-	        return responseModel;
+        Optional<ProductDto> productDtoOut = productService.updateProduct(id, productDtoIn);
+        
+        if (productDtoOut.isEmpty()) {
+            throw new NotFoundException("No product found with the id: " + id);
+        }
+        
+        ProductDto productDto = productDtoOut.get();
+        
+        ProductResponseModel responseModel = new ProductResponseModel();
+        BeanUtils.copyProperties(productDto, responseModel);
+        return responseModel;
 		}
-    }
 	
 	@DeleteMapping("/{id}")
 	String deleteProduct(@PathVariable String id) {

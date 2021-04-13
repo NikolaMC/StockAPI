@@ -9,6 +9,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.exceptions.BadRequestException;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.entity.ProductEntity;
 import com.example.demo.service.ProductService;
@@ -39,9 +40,9 @@ public class ProductServiceImpl implements ProductService {
         return productDtos;
     }
 	
-    @Override
+    
     public Optional<ProductDto> getByProductId(String id) {
-        Optional<ProductEntity> productIdEntity = productRepository.findProductById(id);
+        Optional<ProductEntity> productIdEntity = productRepository.findByProductId(id);
 
         return productIdEntity.map(productEntity -> {
             ProductDto productDto = new ProductDto();
@@ -53,7 +54,7 @@ public class ProductServiceImpl implements ProductService {
 	
 	@Override
 	public ProductDto createProduct(ProductDto productDetails) {
-		Optional<ProductEntity> checkNameEntity = productRepository.findProductByName(productDetails.getName());
+		Optional<ProductEntity> checkNameEntity = productRepository.findByName(productDetails.getName());
 		
         if (checkNameEntity.isPresent()) {
             throw new RuntimeException("That product already exists");
@@ -75,7 +76,7 @@ public class ProductServiceImpl implements ProductService {
 	
 	public Optional<ProductDto> updateProduct(String id, ProductDto productDto) {
 
-        Optional<ProductEntity> productIdEntity = productRepository.findProductById(id);
+        Optional<ProductEntity> productIdEntity = productRepository.findByProductId(id);
         if (productIdEntity.isEmpty()) {
             return Optional.empty();
         }
@@ -86,7 +87,16 @@ public class ProductServiceImpl implements ProductService {
             productEntity.setProductId(productDto.getProductId() != null ? util.generateHashedProductId(productDto.getName()).substring(3) : productEntity.getProductId());
             productEntity.setName(productDto.getName() != null ? productDto.getName() : productEntity.getName());
             productEntity.setCategory(productDto.getCategory() != null ? productDto.getCategory() : productEntity.getCategory());
-            productEntity.setCost(productDto.getCost() != null ? productDto.getCost() : productEntity.getCost());
+            
+            if (productDto.getCost() != null) {
+				if (productDto.getCost() < 0) {
+					throw new BadRequestException("Cost can not be a negative number");
+				} else {
+					productEntity.setCost(productDto.getCost());
+				}
+			} else {
+				productEntity.setCost(productEntity.getCost());
+			}
             
             ProductEntity updatedProductEntity = productRepository.save(productEntity);
             BeanUtils.copyProperties(updatedProductEntity, response);
@@ -97,7 +107,7 @@ public class ProductServiceImpl implements ProductService {
 	
 	@Transactional
     public boolean deleteProduct(String id) {
-      Long removedProductCount = productRepository.deleteProductById(id);
+      Long removedProductCount = productRepository.deleteByProductId(id);
 
       return removedProductCount >0;
     }

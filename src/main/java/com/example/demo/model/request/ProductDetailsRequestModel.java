@@ -5,7 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ProductDetailsRequestModel {
 	@JsonProperty("product_id")
     private String productId;
-    String name, category;
+    private String name;
+    private String category;
     private Integer cost;
 
     public String getProductId() {

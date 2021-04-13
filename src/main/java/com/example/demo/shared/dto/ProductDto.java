@@ -4,7 +4,9 @@ import java.io.Serializable;
 
 public class ProductDto implements Serializable {
 
-    private String productId, name, category;
+    private String productId;
+    private String name;
+    private String category;
     private Integer cost;
 
     public String getProductId() {

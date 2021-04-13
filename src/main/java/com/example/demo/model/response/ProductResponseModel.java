@@ -1,8 +1,12 @@
 package com.example.demo.model.response;
 
-public class ProductResponseModel {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    private String productId, name, category;
+public class ProductResponseModel {
+	@JsonProperty("product_id")
+    private String productId;
+	private String name; 
+	private String category;
     private Integer cost;
 
     public String getProductId() {
